@@ -14,6 +14,7 @@ RE2 = "-?(((([1-9][0-9]*)|0)(\.[0-9]*)?)|(\.[0-9]+))"
 RE3 = "[a-z]+\.[a-z]+@(estudiante\.)?uam\.es"
 # Alternativa: ([^\(\)]*\([^\(\)]*\)[^\(\)]*)+
 RE4 = "(" + _except_parenthesis + "\(" + _except_parenthesis + "\)" + _except_parenthesis + ")+"
+
 # Alternativa: (([^\(\)]*\([^\(\)]*\)[^\(\)]*)+|[^\(\)]*)
 _max_one_parenthesis = "(" + RE4 + "|" + _except_parenthesis + ")"
 # Alternativa: ([^\(\)]*\((([^\(\)]*\([^\(\)]*\)[^\(\)]*)+|[^\(\)]*)\)[^\(\)]*)+
@@ -29,6 +30,9 @@ EJERCICIO 6:
 Incluye a continuacion, dentro de esta cadena, tu respuesta
 al ejercicio 6.
 
-... tu respuesta aqui...
+Para poder crear dicha expresión regular habría que poder tener en cuenta un número
+arbitrariamente grande de posibles niveles de anidación, lo cual implicaría que la
+expresión regular tendría que ser arbitrariamente larga para lo cual no hay espacio
+físico suficiente.
 
 """
