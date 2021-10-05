@@ -1,8 +1,8 @@
 """Evaluation of automata."""
 from typing import Set
 
-from automaton import FiniteAutomaton, State
-from interfaces import AbstractFiniteAutomatonEvaluator
+from automata.automaton import FiniteAutomaton, State
+from automata.interfaces import AbstractFiniteAutomatonEvaluator
 
 
 class FiniteAutomatonEvaluator(
@@ -16,9 +16,19 @@ class FiniteAutomatonEvaluator(
         transiciones lambdas inmediatamente después, mediante la llamada a
         _complete_lambdas)
         """
+        # Important: Do not modify self.current_states, instead assign it
+        # a new set of states to avoid changing old_states from evaluator
+
+        if symbol not in self.automaton.symbols:
+            raise ValueError
+
+        new_current_states = set()
+        for s in self.current_states:
+            new_current_states.update(s.get_transitions(symbol))
 
         self._complete_lambdas(self.current_states)
-        raise NotImplementedError("This method must be implemented.")
+        self.current_states = new_current_states
+        return
 
     def _complete_lambdas(self, set_to_complete: Set[State]) -> None:
         """
@@ -26,11 +36,30 @@ class FiniteAutomatonEvaluator(
         todos los estados que sean alcanzables mediante un número arbitrario de
         transiciones lambda
         """
-        raise NotImplementedError("This method must be implemented.")
+        # Auxiliary set of already expanded states and expected to expand
+        expanded_states = set()
+        to_expand_states = set()
+        to_expand_states.update(set_to_complete)
+
+        while len(to_expand_states) > 0:
+            # Completing lambdas doesnt need an specific order (random with pop)
+            check_state = to_expand_states.pop()
+            expanded_states.add(check_state)
+            # Expand check_state
+            for linked in check_state.get_transitions(None):
+                # Avoid potential infinite loops
+                if linked not in expanded_states:
+                    to_expand_states.add(linked)  # No need to check duplicates
+
+        set_to_complete.update(expanded_states)
+        return
 
     def is_accepting(self) -> bool:
         """
         Indica si la cadena que se ha procesado hasta el momento se
         acepta o no.
         """
-        raise NotImplementedError("This method must be implemented.")
+        for s in self.current_states:
+            if s.is_final:
+                return True
+        return False

@@ -3,6 +3,11 @@ import unittest
 from abc import ABC, abstractmethod
 from typing import Optional, Type
 
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
 from automata.automaton import FiniteAutomaton
 from automata.automaton_evaluator import FiniteAutomatonEvaluator
 from automata.utils import AutomataFormat
