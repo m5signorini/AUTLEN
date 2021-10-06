@@ -26,7 +26,7 @@ class FiniteAutomatonEvaluator(
         for s in self.current_states:
             new_current_states.update(s.get_transitions(symbol))
 
-        self._complete_lambdas(self.current_states)
+        self._complete_lambdas(new_current_states)
         self.current_states = new_current_states
         return
 

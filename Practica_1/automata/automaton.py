@@ -13,7 +13,7 @@ class State(AbstractState):
 
     # You can add new attributes and methods that you think that make your
     # task easier, but you cannot change the constructor interface.
-    transitions: Dict[Optional[str], Set[AbstractState]]
+    transitions: Dict[Optional[str], Set['State']]
 
     def __init__(self, name: str, *, is_final: bool = False) -> None:
         super().__init__(name=name, is_final=is_final)
@@ -33,11 +33,11 @@ class State(AbstractState):
                     self.transitions[t.symbol] = {t.final_state}
         return
 
-    def get_transitions(self, symbol: Optional[str]) -> Set[AbstractState]:
+    def get_transitions(self, symbol: Optional[str]) -> Set['State']:
         """
         Obtain set of final states reached from this state using the arg symbol.
         """
-        return self.transitions.get(symbol, [])
+        return self.transitions.get(symbol, set())
 
 class Transition(AbstractTransition[State]):
     """Transition of an automaton."""
