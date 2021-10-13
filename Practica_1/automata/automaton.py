@@ -144,7 +144,7 @@ class FiniteAutomaton(
             for symbol in self.symbols:
                 # Para el simbolo actual obtenemos estado-conj a los que se llega
                 qn = frozenset(self._get_symbol_closure(expanding_set, symbol))
-                if qn not in new_states_map.keys():
+                if qn not in new_states_map.keys() and len(qn)>0 :
                     # Basta ver que no estaba en el diccionario para añadirlo a to_expand_sets
                     to_expand_sets.add(qn)
                     new_states_map[qn] = State(name='q'+str(nname),is_final=self._set_is_final_state(qn))
