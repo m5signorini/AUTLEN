@@ -242,6 +242,8 @@ class FiniteAutomaton(
                         if compare_state_transition_classes(Q_0, st, repr):
                             Q_1[st] = max_clase
                             unclassed.remove(st)
+            Q_0 = Q_1
+            Q_1 = dict()
 
 
 
