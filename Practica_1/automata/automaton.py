@@ -224,8 +224,7 @@ class FiniteAutomaton(
             # Marcar estados que mantienen clases
             for cl in clases:
                 class_list = get_class_list(Q_0, cl)
-                Q_1[class_list[0]] = cl
-                for st in class_list[1:]:
+                for st in class_list:
                     if compare_state_transition_classes(Q_0, class_list[0], st):
                         Q_1[st] = cl
                         unclassed.remove(st)
