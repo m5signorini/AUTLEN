@@ -234,7 +234,7 @@ class FiniteAutomaton(
                 # Crear nueva clase
                 clases.append(clases[-1]+1)
                 max_clase = clases[-1]
-                repr = unclassed.pop([0])
+                repr = unclassed.pop(0)
                 Q_1[repr] = max_clase
                 # Comprobar para los que quedan sin clase
                 for st in unclassed[:]:
