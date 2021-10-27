@@ -151,12 +151,114 @@ class FiniteAutomaton(
                     nname += 1
                     # Añadir transicion desde el estado asociado a expanding_set hasta qn por simbolo
                     new_transitions.add(Transition(initial_state=new_states_map[expanding_set], symbol=symbol, final_state=new_states_map[qn]))
-                    
+
         # Crear nuevo automata
         new_automaton = FiniteAutomaton(states=set(new_states_map.values()),symbols=self.symbols,transitions=new_transitions,initial_state=q0)
         return new_automaton
 
+
     def to_minimized(
         self,
     ) -> "FiniteAutomaton":
-        raise NotImplementedError("This method must be implemented.")
+
+        # Inicializar nuevo automata
+
+        # Crear lista de equivalencia Q/E0 segun equivalencia por cadenas de longitud 0
+
+        # Bucle hasta que Q/Ei+1 = Q/Ei
+        """
+        def add_state_to_class(d: dict[int, Collection[State]], k: int, s: State):
+            """
+            """
+            if k not in d:
+                d[k] = [s]
+            else:
+                d[k].append(s)
+            return
+        """
+
+        def get_class_list(d: dict[int, Collection[State]], clase: int):
+            """
+            """
+            states = []
+            for st in d.keys():
+                if d[st] == clase:
+                    states.append(st)
+            return states
+
+        def compare_state_transition_classes(d: dict[State, int], s1: State, s2: State):
+            """
+            """
+            # First we generate the list for the elements that are from the same class as s1
+            class_list = get_class_list(d, d[s1])
+
+            s2_transitions = s2.get_transitions()
+
+            for st in s2_transitions:
+                if st.final_state not in class_list:
+                    return False
+
+            return True
+
+        # Dada la lista de clases Q/Ei, para obtener Q/Ei+1:
+        # 1) Hallar inicio de clase
+        # 2) Por cada elemento de la misma clase, se comprueba con cada simbolo
+        #    de alfabeto que la transicion lleva a un estado de la misma clase
+        #    en Q/Ei
+        # 3) Si no, no sigue en la misma clase. En otro caso, se mantiene la clase
+        # 4) Repetir para todos los estados de la misma clase partiendo del inicial
+        Q_0 = dict()
+        Q_1 = dict()
+
+        # Inicializamos Q0 segun si los estados son finales (1) iniciales (0)
+        for st in self.states:
+            if st.is_final:
+                Q_0[st] = 1
+            else:
+                Q_0[st] = 0
+
+
+        while cmp(Q_0,Q_1) != 0:
+            # Guardamos en su misma clase al primer elemento de cada clase de equivalencia
+            # Creamos la lista para clases ya existentes
+            clase = 0
+            # class_list es el conjunto de estados de la misma clase i
+            class_list = get_class_list(Q_0, clase)
+            class_fail = []                     # Estados para nuevas subclases
+            while len(class_list) > 0:
+                for st in class_list:
+                    if compare_state_transition_classes(Q_0, class_list[0], st):
+                        Q_1[st] = clase         # Pertenecen a la misma clase (nueva)
+                    else:
+                        class_fail.append(st)   # st sera de una nueva subclase
+                clase += 1
+                class_list = get_class_list(Q_0, clase)
+
+            # Creamos nuevas clases para los estados fallidos
+            class_list = copy(class_fail)
+            class_fail = []
+            while len(class_list) > 0:
+                repr = class_list[0]
+                for st in class_list:
+                    if Q_0[st] == Q_0[repr] and compare_state_transition_classes(Q_0, st, repr):
+                        Q_1[st] = clase
+                    else:
+                        class_fail.add(st)
+                    # WIP
+
+
+
+
+                clase += 1
+
+
+
+            #for cl in Q_0.keys():
+                # Mantenemos representante de la clase
+                # Comparamos estos estados con el resto de estados de su clase anterior
+                #for st in Q_0[cl]:
+                    #if st
+                #
+            # Para los que no pertenecen a una clase ya existente, vamos creando nuevas
+            # Observacion: seguro que no pertenecen a otra clase distinta ya existente
+        return new_automaton
