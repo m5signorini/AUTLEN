@@ -217,48 +217,34 @@ class FiniteAutomaton(
             else:
                 Q_0[st] = 0
 
-
-        while cmp(Q_0,Q_1) != 0:
-            # Guardamos en su misma clase al primer elemento de cada clase de equivalencia
-            # Creamos la lista para clases ya existentes
-            clase = 0
-            # class_list es el conjunto de estados de la misma clase i
-            class_list = get_class_list(Q_0, clase)
-            class_fail = []                     # Estados para nuevas subclases
-            while len(class_list) > 0:
-                for st in class_list:
+        clases = [0,1]
+        while cmp(Q_0, Q_1) != 0:
+            unclassed = list(Q_0.keys())
+            # Identificar inicio de clase
+            # Marcar estados que mantienen clases
+            for cl in clases:
+                class_list = get_class_list(Q_0, cl)
+                Q_1[class_list[0]] = cl
+                for st in class_list[1:]:
                     if compare_state_transition_classes(Q_0, class_list[0], st):
-                        Q_1[st] = clase         # Pertenecen a la misma clase (nueva)
-                    else:
-                        class_fail.append(st)   # st sera de una nueva subclase
-                clase += 1
-                class_list = get_class_list(Q_0, clase)
-
-            # Creamos nuevas clases para los estados fallidos
-            class_list = copy(class_fail)
-            class_fail = []
-            while len(class_list) > 0:
-                repr = class_list[0]
-                for st in class_list:
-                    if Q_0[st] == Q_0[repr] and compare_state_transition_classes(Q_0, st, repr):
-                        Q_1[st] = clase
-                    else:
-                        class_fail.add(st)
-                    # WIP
-
+                        Q_1[st] = cl
+                        unclassed.remove(st)
+            # Para los estados que cambian de clase:
+            while len(unclassed) > 0:
+                # Crear nueva clase
+                clases.append(clases[-1]+1)
+                max_clase = clases[-1]
+                repr = unclassed.pop([0])
+                Q_1[repr] = max_clase
+                # Comprobar para los que quedan sin clase
+                for st in copy(unclassed):
+                    if Q_0[st] == Q_0[repr]:
+                        if compare_state_transition_classes(Q_0, st, repr):
+                            Q_1[st] = max_clase
+                            unclassed.remove(st)
+            
 
 
-
-                clase += 1
-
-
-
-            #for cl in Q_0.keys():
-                # Mantenemos representante de la clase
-                # Comparamos estos estados con el resto de estados de su clase anterior
-                #for st in Q_0[cl]:
-                    #if st
-                #
             # Para los que no pertenecen a una clase ya existente, vamos creando nuevas
             # Observacion: seguro que no pertenecen a otra clase distinta ya existente
         return new_automaton
