@@ -168,8 +168,6 @@ class FiniteAutomaton(
         # Bucle hasta que Q/Ei+1 = Q/Ei
         """
         def add_state_to_class(d: dict[int, Collection[State]], k: int, s: State):
-            """
-            """
             if k not in d:
                 d[k] = [s]
             else:
@@ -192,13 +190,45 @@ class FiniteAutomaton(
             # First we generate the list for the elements that are from the same class as s1
             class_list = get_class_list(d, d[s1])
 
-            s2_transitions = s2.get_transitions()
+            s2_transitions = []
+            for smb in self.symbols:
+                for tr in s2.transitions[smb]:
+                    s2_transitions.append(tr)
+
 
             for st in s2_transitions:
-                if st.final_state not in class_list:
+                if st not in s1.transitions.values():
                     return False
 
             return True
+
+
+        # Vamos a eliminar estado innaccesibles del automata
+
+        # Lo primero que hacemos es generar el set de estados inaccesibles, ahora debemos eliminarlos del automata
+        accesible_aux = [self.initial_state]
+        #accesible_aux.add(self.initial_state)
+        marked = set()
+
+        while len(accesible_aux) > 0 :
+            st = accesible_aux.pop()
+            for sym in st.transitions.keys():
+                aux = st.transitions[sym].pop()
+                st.transitions[sym].add(aux)
+                if aux not in marked:
+                    accesible_aux.append(aux)
+            marked.add(st)
+
+
+        # Los eliminamos del automata
+        self.states = marked
+
+        #Tambien eliminamos todas las transiciones que tienen este, como estado inicial
+        transitions_aux = list(self.transitions)
+        for tr in self.transitions:
+            if tr.initial_state not in self.states or tr.final_state not in self.states:
+                transitions_aux.remove(tr)
+        self.transitions = transitions_aux
 
         # Dada la lista de clases Q/Ei, para obtener Q/Ei+1:
         # 1) Hallar inicio de clase
@@ -207,6 +237,8 @@ class FiniteAutomaton(
         #    en Q/Ei
         # 3) Si no, no sigue en la misma clase. En otro caso, se mantiene la clase
         # 4) Repetir para todos los estados de la misma clase partiendo del inicial
+
+        
         Q_0 = dict()
         Q_1 = dict()
 
@@ -218,7 +250,8 @@ class FiniteAutomaton(
                 Q_0[st] = 0
 
         clases = [0,1]
-        while cmp(Q_0, Q_1) != 0:
+        while Q_0 != Q_1:
+            Q_1 = dict()
             unclassed = list(Q_0.keys())
             # Identificar inicio de clase
             # Marcar estados que mantienen clases
@@ -241,11 +274,11 @@ class FiniteAutomaton(
                         if compare_state_transition_classes(Q_0, st, repr):
                             Q_1[st] = max_clase
                             unclassed.remove(st)
-            Q_0 = Q_1
-            Q_1 = dict()
-
+            Q_0, Q_1 = Q_1, Q_0
+            
 
 
             # Para los que no pertenecen a una clase ya existente, vamos creando nuevas
             # Observacion: seguro que no pertenecen a otra clase distinta ya existente
+        new_automaton = FiniteAutomaton(states=self.states,symbols=self.symbols,transitions=self.transitions,initial_state=self.initial_state)
         return new_automaton
