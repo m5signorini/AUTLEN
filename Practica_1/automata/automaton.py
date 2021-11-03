@@ -1,5 +1,4 @@
 """Automaton implementation."""
-from __future__ import annotations
 from typing import Collection, Set, Optional, Dict
 from typing_extensions import final
 
@@ -169,7 +168,7 @@ class FiniteAutomaton(
 
         # Bucle hasta que Q/Ei+1 = Q/Ei
 
-        def get_state_by_name(states: set[State], name: str) -> State:
+        def get_state_by_name(states: Collection[State], name: str) -> State:
             """
             """
             for st in states:
@@ -177,7 +176,7 @@ class FiniteAutomaton(
                     return st
             return None
 
-        def get_class_list(d: dict[int, Collection[State]], clase: int) -> list[State]:
+        def get_class_list(d: Dict[int, Collection[State]], clase: int) -> Collection[State]:
             """
             """
             states = []
@@ -186,35 +185,19 @@ class FiniteAutomaton(
                     states.append(st)
             return states
 
-        def compare_state_transition_classes(d: dict[State, int], s1: State, s2: State):
+        def compare_state_transition_classes(d: Dict[State, int], s1: State, s2: State):
             """
             """
             # First we generate the list for the elements that are from the same class as s1
 
-            s1_transitions = []
             for smb in self.symbols:
-                for tr in s1.transitions[smb]:
-                    s1_transitions.append(tr)
-
-            s1_transitions_classes = []
-
-            for st in s1_transitions:
-                s1_transitions_classes.append(d[st])
-
-            s2_transitions = []
-            for smb in self.symbols:
-                for tr in s2.transitions[smb]:
-                    s2_transitions.append(tr)
-
-            s2_transitions_classes = []
-
-            for st in s2_transitions:
-                s2_transitions_classes.append(d[st])
-
-            for cl in s1_transitions_classes:
-                if cl not in s2_transitions_classes:
-                    return False
-
+                # tr are sets of states
+                tr1 = s1.get_transitions(smb)
+                tr2 = s2.get_transitions(smb)
+                for st1 in tr1:
+                    for st2 in tr2:
+                        if d[st1] != d[st2]:
+                            return False
             return True
 
 
