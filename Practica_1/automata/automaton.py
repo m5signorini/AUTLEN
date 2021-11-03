@@ -168,7 +168,7 @@ class FiniteAutomaton(
 
         # Bucle hasta que Q/Ei+1 = Q/Ei
 
-        def get_state_by_name(states: Collection[State], name: str) -> State:
+        def get_state_by_name(states: Collection[State], name: str) -> Optional[State]:
             """
             """
             for st in states:
@@ -176,7 +176,7 @@ class FiniteAutomaton(
                     return st
             return None
 
-        def get_class_list(d: Dict[int, Collection[State]], clase: int) -> Collection[State]:
+        def get_class_list(d: Dict[State, int], clase: int) -> Collection[State]:
             """
             """
             states = []
@@ -185,7 +185,7 @@ class FiniteAutomaton(
                     states.append(st)
             return states
 
-        def compare_state_transition_classes(d: Dict[State, int], s1: State, s2: State):
+        def compare_state_transition_classes(d: Dict[State, int], s1: State, s2: State) -> bool:
             """
             """
             # First we generate the list for the elements that are from the same class as s1
