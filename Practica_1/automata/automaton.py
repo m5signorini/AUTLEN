@@ -1,5 +1,7 @@
 """Automaton implementation."""
 from typing import Collection, Set, Optional, Dict
+from __future__ import annotations
+from typing_extensions import final
 
 from automata.interfaces import (
     AbstractFiniteAutomaton,
@@ -166,16 +168,16 @@ class FiniteAutomaton(
         # Crear lista de equivalencia Q/E0 segun equivalencia por cadenas de longitud 0
 
         # Bucle hasta que Q/Ei+1 = Q/Ei
-        """
-        def add_state_to_class(d: dict[int, Collection[State]], k: int, s: State):
-            if k not in d:
-                d[k] = [s]
-            else:
-                d[k].append(s)
-            return
-        """
 
-        def get_class_list(d: dict[int, Collection[State]], clase: int):
+        def get_state_by_name(states: set[State], name: str) -> State:
+            """
+            """
+            for st in states:
+                if st.name == name:
+                    return st
+            return None
+
+        def get_class_list(d: dict[int, Collection[State]], clase: int) -> list[State]:
             """
             """
             states = []
@@ -184,7 +186,7 @@ class FiniteAutomaton(
                     states.append(st)
             return states
 
-        def compare_state_transition_classes(d: dict[State, int], s1: State, s2: State):
+        def compare_state_transition_classes(d: dict[State, int], s1: State, s2: State) -> bool:
             """
             """
             # First we generate the list for the elements that are from the same class as s1
@@ -275,10 +277,36 @@ class FiniteAutomaton(
                             Q_1[st] = max_clase
                             unclassed.remove(st)
             Q_0, Q_1 = Q_1, Q_0
-            
-
-
             # Para los que no pertenecen a una clase ya existente, vamos creando nuevas
             # Observacion: seguro que no pertenecen a otra clase distinta ya existente
-        new_automaton = FiniteAutomaton(states=self.states,symbols=self.symbols,transitions=self.transitions,initial_state=self.initial_state)
+        
+        final_initial_state = None
+        init_cl = Q_0[self.initial_state]
+
+        # Creamos conjunto nuevo de estados
+        final_states = set()
+        for cl in clases:
+            states = get_class_list(Q_0, cl)
+            repres = states[0]
+            new_state = State(str(cl), is_final=repres.is_final)
+            final_states.add(new_state)
+            if cl == init_cl:
+                final_initial_state = new_state
+        
+        
+        # Creamos conjunto nuevo de transiciones
+        final_transitions = []
+        for st in final_states:
+            cl = int(st.name)
+            states = get_class_list(Q_0, cl)
+            for symbol in self.symbols:
+                next_sts = repres.get_transitions(symbol)
+                # Nos fijamos en uno cualquiera, ya que el automata se
+                # presupone ya determinista
+                for nst in next_sts:
+                    next_cl = Q_0[nst]
+                    break
+                final_transitions.add(Transition(st, symbol, get_state_by_name(final_states, str(next_cl))))
+
+        new_automaton = FiniteAutomaton(states=final_states, symbols=self.symbols, transitions=final_transitions, initial_state=final_initial_state)
         return new_automaton
