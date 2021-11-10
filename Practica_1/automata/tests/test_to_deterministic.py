@@ -202,6 +202,9 @@ class TestToDetLambdasOnly(TestToDeterministicBase):
         self._check_is_deterministic()
         self._check_accept("", should_accept=True)
         self._check_accept("a", exception=ValueError)
+        with open(os.path.join(DOT_PATH, 'test3_to_det.txt'), 'w+') as f:
+            f.write(write_dot(self.automaton))
+            f.write(write_dot(self.automaton_deterministic))
 
 
 
@@ -251,6 +254,9 @@ class TestToDetMultiple(TestToDeterministicBase):
         self._check_accept("x", should_accept=True)
         self._check_accept("", should_accept=False)
         self._check_accept("a", exception=ValueError)
+        with open(os.path.join(DOT_PATH, 'test4_to_det.txt'), 'w+') as f:
+            f.write(write_dot(self.automaton))
+            f.write(write_dot(self.automaton_deterministic))
 
 
 class TestToDetLoops(TestToDeterministicBase):
@@ -293,9 +299,6 @@ class TestToDetLoops(TestToDeterministicBase):
 
     def test_loops(self) -> None:
         self._check_is_deterministic()
-        with open(os.path.join(DOT_PATH, 'test5_to_det.txt'), 'w+') as f:
-            f.write(write_dot(self.automaton))
-            f.write(write_dot(self.automaton_deterministic))
         self._check_accept("h", should_accept=False)
         self._check_accept("hh", should_accept=False)
         self._check_accept("hhhhhhhhhh", should_accept=False)
@@ -307,6 +310,9 @@ class TestToDetLoops(TestToDeterministicBase):
         self._check_accept("hmmmmm", should_accept=False)
         self._check_accept("hmmmmmmmmmmmmmmmmmm", should_accept=True)
         self._check_accept("hmmmmmmmmmmmmmmmmmmh", should_accept=False)
+        with open(os.path.join(DOT_PATH, 'test5_to_det.txt'), 'w+') as f:
+            f.write(write_dot(self.automaton))
+            f.write(write_dot(self.automaton_deterministic))
 
 
 class TestToDetTrivial(TestToDeterministicBase):
@@ -328,6 +334,9 @@ class TestToDetTrivial(TestToDeterministicBase):
     def test_trivials(self) -> None:
         self._check_is_deterministic()
         self._check_accept("", should_accept=True)
+        with open(os.path.join(DOT_PATH, 'test6_to_det.txt'), 'w+') as f:
+            f.write(write_dot(self.automaton))
+            f.write(write_dot(self.automaton_deterministic))
 
 
 if __name__ == '__main__':

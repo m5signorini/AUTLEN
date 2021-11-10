@@ -151,6 +151,7 @@ class FiniteAutomaton(
                     new_states_map[qn] = State(name='q'+str(nname),is_final=self._set_is_final_state(qn))
                     nname += 1
                     # Añadir transicion desde el estado asociado a expanding_set hasta qn por simbolo
+                if len(qn)>0:
                     new_transitions.add(Transition(initial_state=new_states_map[expanding_set], symbol=symbol, final_state=new_states_map[qn]))
 
         # Crear nuevo automata
