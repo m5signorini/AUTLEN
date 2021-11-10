@@ -1,0 +1,47 @@
+digraph {
+  rankdir=LR;
+
+  node [shape = point]; __start_point__
+  vacio[shape=circle]
+  silencio[shape=circle]
+  asentir[shape=circle]
+  dudar[shape=doublecircle]
+  pensar[shape=doublecircle]
+  comprender[shape=doublecircle]
+  saborear[shape=circle]
+  meditar[shape=doublecircle]
+
+  __start_point__ -> vacio
+  meditar -> meditar[label="m"]
+  pensar -> comprender[label="m"]
+  comprender -> saborear[label="m"]
+  asentir -> dudar[label="m"]
+  silencio -> asentir[label="m"]
+  vacio -> silencio[label="h"]
+  silencio -> silencio[label="h"]
+  saborear -> meditar[label="m"]
+  vacio -> vacio[label="λ"]
+  dudar -> pensar[label="m"]
+}
+digraph {
+  rankdir=LR;
+
+  node [shape = point]; __start_point__
+  q4[shape=doublecircle]
+  q0[shape=circle]
+  q5[shape=doublecircle]
+  q6[shape=circle]
+  q1[shape=circle]
+  q3[shape=doublecircle]
+  q2[shape=circle]
+  q7[shape=doublecircle]
+
+  __start_point__ -> q0
+  q1 -> q2[label="m"]
+  q3 -> q4[label="m"]
+  q5 -> q6[label="m"]
+  q0 -> q1[label="h"]
+  q4 -> q5[label="m"]
+  q6 -> q7[label="m"]
+  q2 -> q3[label="m"]
+}

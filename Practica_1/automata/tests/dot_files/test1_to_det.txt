@@ -1,0 +1,44 @@
+digraph {
+  rankdir=LR;
+
+  node [shape = point]; __start_point__
+  Empty[shape=circle]
+  T[shape=circle]
+  Ti[shape=circle]
+  Tib[shape=circle]
+  Tibu[shape=circle]
+  Tibur[shape=circle]
+  Tiburo[shape=circle]
+  Tiburon[shape=doublecircle]
+
+  __start_point__ -> Empty
+  T -> Ti[label="i"]
+  Empty -> T[label="T"]
+  Tibu -> Tibur[label="r"]
+  Tibur -> Tiburo[label="o"]
+  Tiburo -> Tiburon[label="n"]
+  Tib -> Tibu[label="u"]
+  Ti -> Tib[label="b"]
+}
+digraph {
+  rankdir=LR;
+
+  node [shape = point]; __start_point__
+  q4[shape=circle]
+  q5[shape=circle]
+  q0[shape=circle]
+  q6[shape=circle]
+  q3[shape=circle]
+  q1[shape=circle]
+  q2[shape=circle]
+  q7[shape=doublecircle]
+
+  __start_point__ -> q0
+  q2 -> q3[label="b"]
+  q5 -> q6[label="o"]
+  q4 -> q5[label="r"]
+  q3 -> q4[label="u"]
+  q1 -> q2[label="i"]
+  q0 -> q1[label="T"]
+  q6 -> q7[label="n"]
+}
