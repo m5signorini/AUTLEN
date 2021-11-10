@@ -248,7 +248,7 @@ class FiniteAutomaton(
             else:
                 Q_0[st] = 0
 
-        clases = [0,1]
+        clases = list(set(Q_0.values()))
         while Q_0 != Q_1:
             Q_1 = dict()
             unclassed = list(Q_0.keys())
