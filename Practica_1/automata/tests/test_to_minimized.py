@@ -16,22 +16,6 @@ from automata.utils import AutomataFormat, deterministic_automata_isomorphism, w
 class TestEvaluatorBase(ABC, unittest.TestCase):
     """Base class for string acceptance tests."""
 
-    """automaton: FiniteAutomaton
-    automaton_minimized: FiniteAutomaton
-    evaluator: FiniteAutomatonEvaluator
-    evaluator_deterministic: FiniteAutomatonEvaluator
-
-    @abstractmethod
-    def _create_automata(self) -> FiniteAutomaton:
-        pass
-
-    def setUp(self) -> None:
-        
-        self.automaton = self._create_automata()
-        self.evaluator = FiniteAutomatonEvaluator(self.automaton)
-        self.automaton_minimized = self.automaton.to_minimized()
-        self.evaluator_deterministic = FiniteAutomatonEvaluator(self.automaton_deterministic)"""
-
     def _check_to_minimized(
         self,
         automaton: FiniteAutomaton,
@@ -95,7 +79,7 @@ class TestEvaluatorBase(ABC, unittest.TestCase):
             automaton_str = """
             Automaton:
                 Symbols: ab
-                q0 
+                q0
                 q1 final
                 q2
                 q3 final
@@ -189,6 +173,205 @@ class TestEvaluatorBase(ABC, unittest.TestCase):
                 expected = AutomataFormat.read(expected_str)
 
                 self._check_to_minimized(automaton, expected)
+
+    def test_case4(self) -> None:
+                """Test Case 4"""
+                automaton_str = """
+                Automaton:
+                    Symbols: 01
+                    A
+                    B
+                    C final
+                    D
+                    E
+                    F
+                    G
+                    H
+                    --> A
+                    A -0-> B
+                    A -1-> F
+                    B -0-> G
+                    B -1-> C
+                    C -0-> A
+                    C -1-> C
+                    D -0-> C
+                    D -1-> G
+                    E -1-> F
+                    E -0-> H
+                    F -0-> C
+                    F -1-> G
+                    G -0-> G
+                    G -1-> E
+                    H -0-> G
+                    H -1-> C
+                """
+
+                automaton = AutomataFormat.read(automaton_str)
+
+                expected_str = """
+                Automaton:
+                    Symbols: 01
+                    AE
+                    BH
+                    F
+                    G
+                    C final
+                    --> AE
+                    AE -0-> BH
+                    AE -1-> F
+                    BH -0-> G
+                    BH -1-> C
+                    F -0-> C
+                    F -1-> G
+                    G -0-> G
+                    G -1-> AE
+                    C -0-> AE
+                    C -1-> C
+                """
+
+                expected = AutomataFormat.read(expected_str)
+
+                self._check_to_minimized(automaton, expected)
+
+    def test_case5(self) -> None:
+                """Test Case 5, example were every state is indistinguishable and final"""
+                automaton_str = """
+                Automaton:
+                    Symbols: 01
+                    A final
+                    B final
+                    C final
+                    --> A
+                    A -0-> B
+                    A -1-> C
+                    B -0-> C
+                    B -1-> A
+                    C -0-> A
+                    C -1-> B
+                """
+
+                automaton = AutomataFormat.read(automaton_str)
+
+                expected_str = """
+                Automaton:
+                    Symbols: 01
+                    ABC final
+                    --> ABC
+                    ABC -0-> ABC
+                    ABC -1-> ABC
+                """
+
+                expected = AutomataFormat.read(expected_str)
+
+                self._check_to_minimized(automaton, expected)
+
+
+    def test_case6(self) -> None:
+                """Test Case 6, example were every state is distinguishable"""
+                automaton_str = """
+                Automaton:
+                    Symbols: 01
+                    AE
+                    BH
+                    F
+                    G
+                    C final
+                    --> AE
+                    AE -0-> BH
+                    AE -1-> F
+                    BH -0-> G
+                    BH -1-> C
+                    F -0-> C
+                    F -1-> G
+                    G -0-> G
+                    G -1-> AE
+                    C -0-> AE
+                    C -1-> C
+                """
+
+                automaton = AutomataFormat.read(automaton_str)
+
+                expected_str = """
+                Automaton:
+                    Symbols: 01
+                    AE
+                    BH
+                    F
+                    G
+                    C final
+                    --> AE
+                    AE -0-> BH
+                    AE -1-> F
+                    BH -0-> G
+                    BH -1-> C
+                    F -0-> C
+                    F -1-> G
+                    G -0-> G
+                    G -1-> AE
+                    C -0-> AE
+                    C -1-> C
+                """
+
+                expected = AutomataFormat.read(expected_str)
+
+                self._check_to_minimized(automaton, expected)
+
+    def test_case7(self) -> None:
+                """Test Case 7, example were classes 0 and 1 are in the next iteration just divided in two more classes, we start with 2 and we end with 4 partitions"""
+                automaton_str = """
+                Automaton:
+                    Symbols: 01
+                    A
+                    B
+                    C
+                    D
+                    E final
+                    F final
+                    G final
+                    H final
+                    --> A
+                    A -0-> C
+                    A -1-> D
+                    B -0-> D
+                    B -1-> C
+                    C -0-> E
+                    C -1-> F
+                    D -0-> F
+                    D -1-> E
+                    E -1-> G
+                    E -0-> H
+                    F -0-> H
+                    F -1-> G
+                    G -0-> A
+                    G -1-> B
+                    H -0-> B
+                    H -1-> A
+                """
+
+                automaton = AutomataFormat.read(automaton_str)
+
+                expected_str = """
+                Automaton:
+                    Symbols: 01
+                    AB
+                    CD
+                    EF final
+                    GH final
+                    --> AB
+                    AB -0-> CD
+                    AB -1-> CD
+                    CD -0-> EF
+                    CD -1-> EF
+                    EF -0-> GH
+                    EF -1-> GH
+                    GH -0-> AB
+                    GH -1-> AB
+                """
+
+                expected = AutomataFormat.read(expected_str)
+
+                self._check_to_minimized(automaton, expected)
+
 
 
 if __name__ == '__main__':
