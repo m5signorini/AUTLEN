@@ -1,4 +1,4 @@
-from __future__ import annotations
+#from __future__ import annotations
 
 from collections import deque
 from typing import AbstractSet, Collection, MutableSet, Optional
@@ -104,7 +104,7 @@ class Grammar:
         )
 
 
-    def compute_first(self, sentence: str) -> AbstractSet[str]:
+    #def compute_first(self, sentence: str) -> AbstractSet[str]:
         """
         Method to compute the first set of a string.
 
@@ -118,7 +118,7 @@ class Grammar:
 	# TO-DO: Complete this method for exercise 3...
 
 
-    def compute_follow(self, symbol: str) -> AbstractSet[str]:
+    #def compute_follow(self, symbol: str) -> AbstractSet[str]:
         """
         Method to compute the follow set of a non-terminal symbol.
 
@@ -130,9 +130,9 @@ class Grammar:
         """
 
 	# TO-DO: Complete this method for exercise 4...
-	
 
-    def get_ll1_table(self) -> Optional[LL1Table]:
+
+    #def get_ll1_table(self) -> Optional[LL1Table]:
         """
         Method to compute the LL(1) table.
 
@@ -179,6 +179,35 @@ class TableCell:
 
     def __hash__(self) -> int:
         return hash((self.non_terminal, self.terminal))
+
+class ParseTree():
+    """
+    Parse Tree.
+
+    Args:
+        root: root node of the tree.
+        children: list of children, which are also ParseTree objects.
+    """
+    def __init__(self, root: str, children: Collection['ParseTree'] = []) -> None:
+        self.root = root
+        self.children = children
+
+    def __repr__(self) -> str:
+        return (
+            f"{type(self).__name__}({self.root!r}: {self.children})"
+        )
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        return (
+            self.root == other.root
+            and len(self.children) == len(other.children)
+            and all([x.__eq__(y) for x, y in zip(self.children, other.children)])
+        )
+
+    def add_children(self, children: Collection['ParseTree']) -> None:
+        self.children = children
 
 class LL1Table:
     """
@@ -270,36 +299,29 @@ class LL1Table:
         Raises:
             SyntaxError: if the input string is not syntactically correct.
         """
-        
-	# TO-DO: Complete this method for exercise 2...
+
+	    # TO-DO: Complete this method for exercise 2...
+
+        # We use a list as if it was a stack
+        stack = []
+        stack.append("$")
+        for ele in start[::-1]:
+            stack.append(ele)
+
+        while stack != ["$"]:
+            top = stack.pop()
+            if top in self.non_terminals:
+                new_top = self.cells[(top, input_string[0])]
+                if new_top:
+                    stack = new_top + top
+                else:
+                    raise SyntaxError
+            elif top in self.terminals:
+                if top == input_string[0]:
+                    input_string = input_string[1:]
+                else:
+                    raise SyntaxError
+            else:
+                raise SyntaxError
 
         return ParseTree("") # Return an empty tree by default.
-    
-class ParseTree():
-    """
-    Parse Tree.
-
-    Args:
-        root: root node of the tree.
-        children: list of children, which are also ParseTree objects.
-    """
-    def __init__(self, root: str, children: Collection[ParseTree] = []) -> None:
-        self.root = root
-        self.children = children
-
-    def __repr__(self) -> str:
-        return (
-            f"{type(self).__name__}({self.root!r}: {self.children})"
-        )
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, type(self)):
-            return NotImplemented
-        return (
-            self.root == other.root
-            and len(self.children) == len(other.children)
-            and all([x.__eq__(y) for x, y in zip(self.children, other.children)])
-        )
-
-    def add_children(self, children: Collection[ParseTree]) -> None:
-        self.children = children
