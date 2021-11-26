@@ -93,6 +93,7 @@ class Grammar:
         self.terminals = terminals
         self.non_terminals = non_terminals
         self.productions = productions
+        self.productions_aux = productions.copy()
         self.axiom = axiom
 
     def __repr__(self) -> str:
@@ -152,6 +153,17 @@ class Grammar:
 
         return sentence_firsts
 
+    def check_for_loops(self, symbol, previous_symbol) -> Collection[Production]:
+        aux = self.productions.copy()
+
+        for prod in self.productions:
+            if symbol in prod.right:
+                i = prod.right.index(symbol)
+                if prod.right[i+1:] == "" and prod.left == previous_symbol:
+                    aux.remove(prod)
+
+        return aux
+
 
     def compute_follow(self, symbol: str) -> AbstractSet[str]:
         """
@@ -170,14 +182,16 @@ class Grammar:
         if symbol == self.productions[0].left:
             symbol_follow.add("$")
 
-        for prod in self.productions:
+        for prod in self.productions_aux:
             if symbol in prod.right:
                 i = prod.right.index(symbol)
                 symbol_follow = symbol_follow.union(self.compute_first(prod.right[i+1:]))
                 if "" in symbol_follow:
                     symbol_follow.remove("")
-                    if symbol != prod.left:
+                    if symbol != prod.left and symbol != symbol_follow:
+                        self.productions_aux = self.check_for_loops(prod.left, symbol)
                         symbol_follow = symbol_follow.union(self.compute_follow(prod.left))
+                        self.productions_aux = self.productions
 
         return symbol_follow
 

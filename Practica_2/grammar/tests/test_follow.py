@@ -43,7 +43,7 @@ class TestFollow(unittest.TestCase):
         """Test Case 2."""
         grammar_str = """
         E -> TX
-        X -> +TE
+        X -> +TX
         X ->  
         T -> FY
         Y -> *FY
