@@ -39,6 +39,45 @@ class TestFollow(unittest.TestCase):
         self._check_follow(grammar, "X", {'$', ')'})
         self._check_follow(grammar, "Y", {'$', ')', '+'})
 
+    def test_case2(self) -> None:
+        """Test Case 2."""
+        grammar_str = """
+        E -> TX
+        X -> +TE
+        X ->  
+        T -> FY
+        Y -> *FY
+        Y -> 
+        F -> (E)
+        F -> i
+        """
+
+        grammar = GrammarFormat.read(grammar_str)
+        self._check_follow(grammar, "E", {'$', ')'})
+        self._check_follow(grammar, "X", {'$', ')'})
+        self._check_follow(grammar, "T", {'+','$', ')'})
+        self._check_follow(grammar, "Y", {'$', ')', '+'})
+        self._check_follow(grammar, "F", {'$', ')', '+','*'})
+
+    def test_case3(self) -> None:
+        """Test Case 3."""
+        grammar_str = """
+        A -> Aa
+        A -> BCD
+        B -> b
+        B -> 
+        C -> c
+        C ->
+        D -> d
+        D -> Ce 
+        """
+
+        grammar = GrammarFormat.read(grammar_str)
+        self._check_follow(grammar, "A", {'$', 'a'})
+        self._check_follow(grammar, "B", {'c', 'd', 'e'})
+        self._check_follow(grammar, "C", {'c', 'd', 'e'})
+        self._check_follow(grammar, "D", {'$', 'a'})
+
 
 if __name__ == '__main__':
     unittest.main()

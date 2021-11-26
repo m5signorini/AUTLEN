@@ -2,6 +2,7 @@
 
 from collections import deque
 from typing import AbstractSet, Collection, MutableSet, Optional
+from typing import Union, List
 
 class RepeatedCellError(Exception):
     """Exception for repeated cells in LL(1) tables."""
@@ -104,7 +105,7 @@ class Grammar:
         )
 
 
-    #def compute_first(self, sentence: str) -> AbstractSet[str]:
+    def compute_first(self, sentence: str) -> AbstractSet[str]:
         """
         Method to compute the first set of a string.
 
@@ -115,10 +116,44 @@ class Grammar:
             First set of str.
         """
 
-	# TO-DO: Complete this method for exercise 3...
+        sentence_firsts = set()
+        i = 0
+
+        if sentence != "":
+            letter = sentence[i]
+        else:
+            letter = sentence
+        if letter in self.terminals:
+            sentence_firsts.add(letter)
+            return sentence_firsts
+        elif letter in self.non_terminals:
+            for prod in self.productions:
+                if prod.left == letter:
+                    if prod.right != "" and prod.right[0] != letter:
+                        sentence_firsts = sentence_firsts.union(self.compute_first(prod.right))
+                    elif prod.right == "":
+                        i+=1
+                        if len(sentence) > i:
+                           sentence_firsts = sentence_firsts.union(self.compute_first(sentence[i]))
+                           while "" in sentence_firsts:
+                            i+=1
+                            sentence_firsts.remove("")
+                            if len(sentence) > i:
+                                sentence_firsts = sentence_firsts.union(self.compute_first(sentence[i]))
+                            elif len(sentence) == i:
+                                sentence_firsts.add("")
+                            else:
+                                sentence_firsts.add("")
+                                break
+                        elif len(sentence) == i:
+                            sentence_firsts.add("")
+        elif letter == "":
+            sentence_firsts.add("")
+
+        return sentence_firsts
 
 
-    #def compute_follow(self, symbol: str) -> AbstractSet[str]:
+    def compute_follow(self, symbol: str) -> AbstractSet[str]:
         """
         Method to compute the follow set of a non-terminal symbol.
 
@@ -130,6 +165,21 @@ class Grammar:
         """
 
 	# TO-DO: Complete this method for exercise 4...
+        symbol_follow = set()
+
+        if symbol == self.productions[0].left:
+            symbol_follow.add("$")
+
+        for prod in self.productions:
+            if symbol in prod.right:
+                i = prod.right.index(symbol)
+                symbol_follow = symbol_follow.union(self.compute_first(prod.right[i+1:]))
+                if "" in symbol_follow:
+                    symbol_follow.remove("")
+                    if symbol != prod.left:
+                        symbol_follow = symbol_follow.union(self.compute_follow(prod.left))
+
+        return symbol_follow
 
 
     #def get_ll1_table(self) -> Optional[LL1Table]:
@@ -305,23 +355,37 @@ class LL1Table:
         # We use a list as if it was a stack
         stack = []
         stack.append("$")
+
         for ele in start[::-1]:
             stack.append(ele)
 
         while stack != ["$"]:
             top = stack.pop()
-            if top in self.non_terminals:
-                new_top = self.cells[(top, input_string[0])]
-                if new_top:
-                    stack = new_top + top
+            if top in self.non_terminals and len(input_string):
+                first_input = input_string[0]
+                if (top, first_input) in self.cells.keys():
+                    new_top = self.cells[(top, first_input)]
+                    if new_top or new_top == '':
+                        for ele in new_top[::-1]:
+                            stack.append(ele)
+                    else:
+                        raise SyntaxError
                 else:
                     raise SyntaxError
+
             elif top in self.terminals:
-                if top == input_string[0]:
-                    input_string = input_string[1:]
+                if len(input_string) != 0:
+                    if top == input_string[0]:
+                        if input_string != "$":
+                            input_string = input_string[1:]
+                    else:
+                        raise SyntaxError
                 else:
                     raise SyntaxError
             else:
                 raise SyntaxError
+
+        if(len(input_string) != 1):
+            raise SyntaxError
 
         return ParseTree("") # Return an empty tree by default.
