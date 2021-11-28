@@ -195,8 +195,18 @@ class Grammar:
 
         return symbol_follow
 
+    """
+    def remove_left_ll1_indirect_recursion(self) -> Collection[Production]:
+        non_recursive = self.productions.copy()
 
-    #def get_ll1_table(self) -> Optional[LL1Table]:
+        for prod in self.productions():
+            if prod.right in prod:
+                
+
+        return non_recursive
+    """
+
+    def get_ll1_table(self) -> Optional['LL1Table']:
         """
         Method to compute the LL(1) table.
 
@@ -205,6 +215,25 @@ class Grammar:
         """
 
 	# TO-DO: Complete this method for exercise 5...
+
+        cells = []
+
+        for prod in self.productions:
+            first = self.compute_first(prod.right)
+            for ele in first:
+                if ele in self.terminals:
+                    cells.append(TableCell(prod.left, ele, prod.right))
+                elif ele == "":
+                    follow = self.compute_follow(prod.left)
+                    if "$" in follow:
+                        cells.append(TableCell(prod.left, "$", prod.right))
+                    for foll in follow:
+                        if foll in self.terminals:
+                            cells.append(TableCell(prod.left, foll, prod.right))
+
+
+        return LL1Table(self.non_terminals, self.terminals.union("$"), cells)
+
 
 
     def is_ll1(self) -> bool:
