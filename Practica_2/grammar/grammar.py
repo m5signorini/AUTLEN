@@ -400,17 +400,32 @@ class LL1Table:
         stack.append("$")
 
         for ele in start[::-1]:
-            stack.append(ele)
+            tree = ParseTree(ele)
+            stack.append((ele, tree))
+            if ele == start[-1]:
+                root = tree
 
-        while stack != ["$"]:
-            top = stack.pop()
+        # We itter til the last element in the stack is "$"
+        while len(stack) != 1:
+            top_tuple = stack.pop()
+
+            current_tree = top_tuple[1]
+            top = top_tuple[0]
+
             if top in self.non_terminals and len(input_string):
                 first_input = input_string[0]
                 if (top, first_input) in self.cells.keys():
                     new_top = self.cells[(top, first_input)]
                     if new_top or new_top == '':
+                        children = []
+                        if new_top == "":
+                            child = ParseTree("λ")
+                            children.append(child)
                         for ele in new_top[::-1]:
-                            stack.append(ele)
+                            child = ParseTree(ele)
+                            children.append(child)
+                            stack.append((ele, child))
+                        current_tree.add_children(children[::-1])
                     else:
                         raise SyntaxError
                 else:
@@ -431,4 +446,4 @@ class LL1Table:
         if(len(input_string) != 1):
             raise SyntaxError
 
-        return ParseTree("") # Return an empty tree by default.
+        return root # Return an empty tree by default.
