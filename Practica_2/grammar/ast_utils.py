@@ -180,11 +180,14 @@ class ASTRemoveConstantIf(ast.NodeTransformer):
 
     def visit_If(self, node: ast.If) -> Union[ast.AST, List[ast.stmt]]:
         # usar node.test, node.test.value, node.bodyy node.orelse
-        if node.test.value:
-            return node.body
+        # Llamamos a los nodos hijos primero
+        self.generic_visit(node)
+        if isinstance(node.test, ast.Constant):
+            if node.test.value:
+                return node.body
 
-        elif not node.test.value:
-            node.body = node.orelse
-            return node.orelse
+            elif not node.test.value:
+                node.body = node.orelse
+                return node.orelse
 
         return node
