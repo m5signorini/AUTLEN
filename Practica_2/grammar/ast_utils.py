@@ -182,7 +182,9 @@ class ASTRemoveConstantIf(ast.NodeTransformer):
         # usar node.test, node.test.value, node.bodyy node.orelse
         # Llamamos a los nodos hijos primero
         self.generic_visit(node)
-        if isinstance(node.test, ast.Constant):
+        # Python 3.6? at least 3.7: NameConstant
+        # Python >= 3.8: Constant
+        if isinstance(node.test, ast.Constant) or isinstance(node.test, ast.NameConstant):
             if node.test.value:
                 return node.body
 
