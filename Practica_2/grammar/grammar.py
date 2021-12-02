@@ -96,6 +96,8 @@ class Grammar:
         self.productions_aux = productions.copy()
         self.axiom = axiom
 
+        self.recursive_stack = []
+
     def __repr__(self) -> str:
         return (
             f"{type(self).__name__}("
@@ -126,30 +128,38 @@ class Grammar:
             letter = sentence
         if letter in self.terminals:
             sentence_firsts.add(letter)
-            return sentence_firsts
         elif letter in self.non_terminals:
+            
             for prod in self.productions:
+                # To avoid infinite loops
+                if prod in self.recursive_stack:
+                    continue
+                self.recursive_stack.append(prod)
                 if prod.left == letter:
                     if prod.right != "" and prod.right[0] != letter:
                         sentence_firsts = sentence_firsts.union(self.compute_first(prod.right))
                     elif prod.right == "":
                         i+=1
                         if len(sentence) > i:
-                           sentence_firsts = sentence_firsts.union(self.compute_first(sentence[i]))
-                           while "" in sentence_firsts:
-                            i+=1
-                            sentence_firsts.remove("")
-                            if len(sentence) > i:
-                                sentence_firsts = sentence_firsts.union(self.compute_first(sentence[i]))
-                            elif len(sentence) == i:
-                                sentence_firsts.add("")
-                            else:
-                                sentence_firsts.add("")
-                                break
+                            sentence_firsts = sentence_firsts.union(self.compute_first(sentence[i]))
+                            while "" in sentence_firsts:
+                                i+=1
+                                sentence_firsts.remove("")
+                                if len(sentence) > i:
+                                    sentence_firsts = sentence_firsts.union(self.compute_first(sentence[i]))
+                                elif len(sentence) == i:
+                                    sentence_firsts.add("")
+                                else:
+                                    sentence_firsts.add("")
+                                    break
                         elif len(sentence) == i:
                             sentence_firsts.add("")
+                self.recursive_stack.pop()
+
         elif letter == "":
             sentence_firsts.add("")
+        
+
 
         return sentence_firsts
 
