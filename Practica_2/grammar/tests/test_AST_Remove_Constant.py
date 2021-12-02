@@ -9,8 +9,12 @@ import inspect
 from ast_utils import ASTRemoveConstantIf, ASTDotVisitor
 
 def my_fun(p):
+    x = 1
     if True:
-        return 1
+        if False:
+            return 1
+        else:
+            return -1
     else:
         return 0
 
